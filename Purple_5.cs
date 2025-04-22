@@ -33,13 +33,13 @@ namespace Lab_7
                 {
                     case 1:
                         string answer = _animal;
-                        return responses.Count(a => a.Animal != null && a.Animal.Length > 0);
+                        return answer != null ? responses.Count(a => a.Animal != null && a.Animal == answer) : 0;
                     case 2:
                         string answer2 = _characterTrait;
-                        return responses.Count(a => a.CharacterTrait != null && a.CharacterTrait.Length > 0);
+                        return answer2 != null ? responses.Count(a => a.CharacterTrait != null && a.CharacterTrait == answer2) : 0;
                     case 3:
-
-                        return responses.Count(a => a.Concept != null && a.Concept.Length > 0);
+                        string answer3 = _concept;
+                        return answer3 != null ? responses.Count(a => a.Concept != null && a.Concept == answer3) : 0;
                     default:
                         return 0;
                 }
@@ -199,48 +199,97 @@ namespace Lab_7
 
             public (string, double)[] GetGeneralReport(int question)
             {
-                if (_research == null || question > 3 || question < 1)
+                if (question < 1 || question > 3 || _research == null)
                     return null;
 
-                Response[] validResponses = GetAllValidResponses(question);
-                int totalResponses = validResponses.Length;
-
-                if (totalResponses == 0)
-                    return Array.Empty<(string, double)>();
-
-                string[] uniqueValues = new string[totalResponses];
-                int[] counts = new int[totalResponses];
-                int uniqueCount = 0;
-
-                for (int i = 0; i < validResponses.Length; i++)
+                int t_Count = 0;
+                foreach (var research in _research)
                 {
-                    string value = Answer(validResponses[i], question);
-                    bool found = false;
-
-                    for (int j = 0; j < uniqueCount; j++)
+                    if (research.Responses != null)
                     {
-                        if (uniqueValues[j] == value)
+                        foreach (var response in research.Responses)
                         {
-                            counts[j]++;
-                            found = true;
-                            break;
+                            string value = Answer(response, question);
+                            if (value != null)
+                                t_Count++;
                         }
                     }
+                }
 
-                    if (!found)
+                if (t_Count == 0)
+                    return Array.Empty<(string, double)>();
+                string[] All_Values = new string[t_Count];
+                int index = 0;
+                foreach (var research in _research)
+                {
+                    if (research.Responses != null)
                     {
-                        uniqueValues[uniqueCount] = value;
-                        counts[uniqueCount] = 1;
-                        uniqueCount++;
+                        foreach (var response in research.Responses)
+                        {
+                            string value = Answer(response, question);
+                            if (value != null)
+                                All_Values[index++] = value;
+                        }
+                    }
+                }
+                for (int i = 0; i < All_Values.Length - 1; i++)
+                {
+                    for (int j = 0; j < All_Values.Length - i - 1; j++)
+                    {
+                        if (string.Compare(All_Values[j], All_Values[j + 1]) > 0)
+                        {
+                            string temp = All_Values[j];
+                            All_Values[j] = All_Values[j + 1];
+                            All_Values[j + 1] = temp;
+                        }
                     }
                 }
 
-                var result = new (string, double)[uniqueCount];
-                for (int i = 0; i < uniqueCount; i++)
-                {
-                    result[i] = (uniqueValues[i], (double)counts[i] / totalResponses * 100);
-                }
+                int U_Count = 0;
+                string[] U_Values = new string[All_Values.Length];
+                int[] counts = new int[All_Values.Length];
 
+                if (All_Values.Length > 0)
+                {
+                    U_Values[0] = All_Values[0];
+                    counts[0] = 1;
+                    U_Count = 1;
+
+                    for (int i = 1; i < All_Values.Length; i++)
+                    {
+                        if (All_Values[i] == All_Values[i - 1])
+                        {
+                            counts[U_Count - 1]++;
+                        }
+                        else
+                        {
+                            U_Values[U_Count] = All_Values[i];
+                            counts[U_Count] = 1;
+                            U_Count++;
+                        }
+                    }
+                }
+                for (int i = 1; i < U_Count; i++)
+                {
+                    string currentVal = U_Values[i];
+                    int currentCount = counts[i];
+                    int j = i - 1;
+
+                    while (j >= 0 && counts[j] < currentCount)
+                    {
+                        U_Values[j + 1] = U_Values[j];
+                        counts[j + 1] = counts[j];
+                        j--;
+                    }
+
+                    U_Values[j + 1] = currentVal;
+                    counts[j + 1] = currentCount;
+                }
+                var result = new (string, double)[U_Count];
+                for (int i = 0; i < U_Count; i++)
+                {
+                    result[i] = (U_Values[i], (double)counts[i] / t_Count * 100);
+                }
                 return result;
             }
 

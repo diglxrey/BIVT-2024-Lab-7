@@ -136,33 +136,45 @@ namespace Lab_7
             }
             public static Group Merge(Group group1, Group group2)
             {
-                var group_sum = new Group("Финалисты");
-                if (group1.Sportsmen == null && group2.Sportsmen == null) return group_sum;
-                else if (group1.Sportsmen == null)
+                if (group1.Sportsmen == null && group2.Sportsmen == null)
+                    return new Group("Финалисты");
+
+                if (group1.Sportsmen == null || group1.Sportsmen.Length == 0)
+                    return group2;
+
+                if (group2.Sportsmen == null || group2.Sportsmen.Length == 0)
+                    return group1;
+
+                group1.Sort();
+                group2.Sort();
+
+                int n = group1.Sportsmen.Length;
+                int m = group2.Sportsmen.Length;
+                var m_Sportsmen = new Sportsman[n + m];
+
+                int i = 0, j = 0, k = 0;
+                while (i < n && j < m)
                 {
-                    Array.Copy(group2._sportsmen, group_sum.Sportsmen, group2._sportsmen.Length);
-                    return group_sum;
+                    if (group1.Sportsmen[i].Time <= group2.Sportsmen[j].Time)
+                        m_Sportsmen[k++] = group1.Sportsmen[i++];
+                    else
+                        m_Sportsmen[k++] = group2.Sportsmen[j++];
                 }
-                else if (group2.Sportsmen == null)
+
+                for (; i < n; i++, k++)
                 {
-                    Array.Copy(group1._sportsmen, group_sum.Sportsmen, group1._sportsmen.Length);
-                    return group_sum;
+                    m_Sportsmen[k] = group1.Sportsmen[i];
                 }
-                Array.Resize(ref group_sum._sportsmen, group1._sportsmen.Length + group2._sportsmen.Length);
-                for (int i3 = 0, j2 = 0, k1 = 0; i3 < group1.Sportsmen.Length || j2 < group2._sportsmen.Length;)
+
+                for (; j < m; j++, k++)
                 {
-                    if (i3 < group1.Sportsmen.Length && j2 < group2._sportsmen.Length)
-                    {
-                        if (group1._sportsmen[i3].Time <= group2._sportsmen[j2].Time)
-                            group_sum._sportsmen[k1++] = group1._sportsmen[i3++];
-                        else group_sum._sportsmen[k1++] = group2._sportsmen[j2++];
-                    }
-                    else if (i3 < group1._sportsmen.Length)
-                        group_sum._sportsmen[k1++] = group1._sportsmen[i3++];
-                    else if (j2 < group2._sportsmen.Length)
-                        group_sum._sportsmen[k1++] = group2._sportsmen[j2++];
+                    m_Sportsmen[k] = group2.Sportsmen[j];
                 }
-                return group_sum;
+
+                var m_Group = new Group("Финалисты");
+                m_Group.Add(m_Sportsmen);
+
+                return m_Group;
             }
 
             public void Split(out Sportsman[] men, out Sportsman[] women)
@@ -235,7 +247,6 @@ namespace Lab_7
                     i4.Print();
                 }
             }
-
         }
     }
 }

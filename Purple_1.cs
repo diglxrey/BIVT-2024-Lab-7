@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Lab_7.Purple_4;
 
 namespace Lab_7
 {
@@ -207,17 +208,17 @@ namespace Lab_7
             public void Add(Participant[] players)
             {
                 if (players == null || _participants == null) return;
-                
-                int n = _participants.Length;
-                for (int player_ind = 0; player_ind < players.Length; player_ind++)
+
+                int indexN = _participants.Length;
+
+                Array.Resize(ref _participants, indexN + players.Length);
+                for (int i1 = indexN; i1 < _participants.Length; i1++)
                 {
-                    if (players[player_ind] != null)
-                    {
-                        Evaluate(players[player_ind]);
-                        Array.Resize(ref _participants, _participants.Length + 1);
-                        _participants[_participants.Length - 1] = players[player_ind];
-                    }
+                    _participants[i1] = players[i1 - indexN];
                 }
+
+                for (int i = indexN; i < _participants.Length; i++) Evaluate(_participants[i]);
+                    
             }
 
             public void Sort()
