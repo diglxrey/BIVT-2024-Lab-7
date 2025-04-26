@@ -76,7 +76,7 @@ namespace Lab_7
             private string _name;
             private Sportsman[] _sportsmen;
             public string Name => _name;
-            public Sportsman[] Sportsmen => (_sportsmen == null) ? _sportsmen : (Sportsman[])_sportsmen.Clone(); 
+            public Sportsman[] Sportsmen => (_sportsmen == null) ? _sportsmen : (Sportsman[])_sportsmen.Clone();
 
             public Group(string name)
             {
@@ -136,45 +136,33 @@ namespace Lab_7
             }
             public static Group Merge(Group group1, Group group2)
             {
-                if (group1.Sportsmen == null && group2.Sportsmen == null)
-                    return new Group("Финалисты");
-
-                if (group1.Sportsmen == null || group1.Sportsmen.Length == 0)
-                    return group2;
-
-                if (group2.Sportsmen == null || group2.Sportsmen.Length == 0)
-                    return group1;
-
-                group1.Sort();
-                group2.Sort();
-
-                int n = group1.Sportsmen.Length;
-                int m = group2.Sportsmen.Length;
-                var m_Sportsmen = new Sportsman[n + m];
-
-                int i = 0, j = 0, k = 0;
-                while (i < n && j < m)
+                var group_sum = new Group("Финалисты");
+                if (group1.Sportsmen == null && group2.Sportsmen == null) return group_sum;
+                else if (group1.Sportsmen == null)
                 {
-                    if (group1.Sportsmen[i].Time <= group2.Sportsmen[j].Time)
-                        m_Sportsmen[k++] = group1.Sportsmen[i++];
-                    else
-                        m_Sportsmen[k++] = group2.Sportsmen[j++];
+                    Array.Copy(group2._sportsmen, group_sum.Sportsmen, group2._sportsmen.Length);
+                    return group_sum;
                 }
-
-                for (; i < n; i++, k++)
+                else if (group2.Sportsmen == null)
                 {
-                    m_Sportsmen[k] = group1.Sportsmen[i];
+                    Array.Copy(group1._sportsmen, group_sum.Sportsmen, group1._sportsmen.Length);
+                    return group_sum;
                 }
-
-                for (; j < m; j++, k++)
+                Array.Resize(ref group_sum._sportsmen, group1._sportsmen.Length + group2._sportsmen.Length);
+                for (int i3 = 0, j2 = 0, k1 = 0; i3 < group1.Sportsmen.Length || j2 < group2._sportsmen.Length;)
                 {
-                    m_Sportsmen[k] = group2.Sportsmen[j];
+                    if (i3 < group1.Sportsmen.Length && j2 < group2._sportsmen.Length)
+                    {
+                        if (group1._sportsmen[i3].Time <= group2._sportsmen[j2].Time)
+                            group_sum._sportsmen[k1++] = group1._sportsmen[i3++];
+                        else group_sum._sportsmen[k1++] = group2._sportsmen[j2++];
+                    }
+                    else if (i3 < group1._sportsmen.Length)
+                        group_sum._sportsmen[k1++] = group1._sportsmen[i3++];
+                    else if (j2 < group2._sportsmen.Length)
+                        group_sum._sportsmen[k1++] = group2._sportsmen[j2++];
                 }
-
-                var m_Group = new Group("Финалисты");
-                m_Group.Add(m_Sportsmen);
-
-                return m_Group;
+                return group_sum;
             }
 
             public void Split(out Sportsman[] men, out Sportsman[] women)
@@ -213,29 +201,41 @@ namespace Lab_7
 
             public void Shuffle()
             {
-                if (_sportsmen == null || _sportsmen.Length == 0) return;
-
+                if (_sportsmen == null || _sportsmen.Length == 0)
+                    return;
                 Sort();
-                Sportsman[] men, women;
-                Split(out men, out women);
+                Split(out Sportsman[] men, out Sportsman[] women);
 
-                if (men.Length == 0 || women.Length == 0)
+                if (men == null || women == null || men.Length == 0 || women.Length == 0)
                     return;
 
-                var result = new Sportsman[men.Length + women.Length];
-                int maxCount = Math.Max(men.Length, women.Length);
-                int index = 0;
 
-                for (int i = 0; i < maxCount; i++)
+                int i = 0, j = 0, k = 0;
+
+                bool who_first = men[0].Time <= women[0].Time;
+
+                while (i < men.Length && j < women.Length)
                 {
-                    if (i < men.Length)
-                        result[index++] = men[i];
-                    if (i < women.Length)
-                        result[index++] = women[i];
+                    if (who_first)
+                    {
+                        _sportsmen[k++] = men[i++];
+                        _sportsmen[k++] = women[j++];
+                    }
+                    else
+                    {
+                        _sportsmen[k++] = women[j++];
+                        _sportsmen[k++] = men[i++];
+                    }
                 }
 
-                _sportsmen = result;
+                while (i < men.Length)
+                    _sportsmen[k++] = men[i++];
+
+                while (j < women.Length)
+                    _sportsmen[k++] = women[j++];
+
             }
+
             public void Print()
             {
                 Console.WriteLine($"Name {_name}");
@@ -247,6 +247,7 @@ namespace Lab_7
                     i4.Print();
                 }
             }
+
         }
     }
 }

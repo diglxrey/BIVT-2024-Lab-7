@@ -70,22 +70,19 @@ namespace Lab_7
 
             public static void Sort(Participant[] array)
             {
-                if (array == null) return;
+                if (array == null || array.Length < 2) return;
 
-                for (int i2 = 1, j1 = 2; i2 < array.Length;)
+                for (int i = 1; i < array.Length; i++)
                 {
-                    if (i2 == 0 || array[i2].TotalScore <= array[i2 - 1].TotalScore)
+                    Participant current = array[i];
+                    int j = i - 1;
+
+                    while (j >= 0 && array[j].TotalScore < current.TotalScore)
                     {
-                        i2 = j1;
-                        j1++;
+                        array[j + 1] = array[j];
+                        j--;
                     }
-                    else
-                    {
-                        var temp = array[i2];
-                        array[i2] = array[i2 - 1];
-                        array[i2 - 1] = temp;
-                        i2--;
-                    }
+                    array[j + 1] = current;
                 }
             }
             public void Print()
@@ -137,13 +134,9 @@ namespace Lab_7
             {
                 if (_marks == null || _marks.Length == 0) return 0;
 
-                if (_NMark == _marks.Length)
-                {
-                    _NMark = 0;
-                    return _marks[_NMark++];
-                }
-                else return _marks[_NMark++];
-
+                int mark = _marks[_NMark];
+                _NMark = (_NMark + 1) % _marks.Length; // Исправленный циклический переход
+                return mark;
             }
 
             public void Print()
@@ -179,7 +172,7 @@ namespace Lab_7
 
                 _participants = new Participant[0];
             }
-
+    
             public void Evaluate(Participant jumper)
             {
                 if (jumper == null || _judges == null) return;
@@ -187,10 +180,12 @@ namespace Lab_7
                 var result_Marks = new int[7];
                 int judge_ind = 0;
 
-                for (int i5 = 0; i5 < _judges.Length; i5++)
-                {   
-                    result_Marks[judge_ind++] = _judges[i5].CreateMark();
-                    if (judge_ind >= 7) break;
+                for (int i = 0; i < _judges.Length && judge_ind < 7; i++)
+                {
+                    if (_judges[i] != null)
+                    {
+                        result_Marks[judge_ind++] = _judges[i].CreateMark();
+                    }
                 }
 
                 jumper.Jump(result_Marks);
