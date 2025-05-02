@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Lab_7.Purple_4;
 
 namespace Lab_7
 {
@@ -70,19 +69,22 @@ namespace Lab_7
 
             public static void Sort(Participant[] array)
             {
-                if (array == null || array.Length < 2) return;
+                if (array == null) return;
 
-                for (int i = 1; i < array.Length; i++)
+                for (int i2 = 1, j1 = 2; i2 < array.Length;)
                 {
-                    Participant current = array[i];
-                    int j = i - 1;
-
-                    while (j >= 0 && array[j].TotalScore < current.TotalScore)
+                    if (i2 == 0 || array[i2].TotalScore <= array[i2 - 1].TotalScore)
                     {
-                        array[j + 1] = array[j];
-                        j--;
+                        i2 = j1;
+                        j1++;
                     }
-                    array[j + 1] = current;
+                    else
+                    {
+                        var temp = array[i2];
+                        array[i2] = array[i2 - 1];
+                        array[i2 - 1] = temp;
+                        i2--;
+                    }
                 }
             }
             public void Print()
@@ -122,11 +124,11 @@ namespace Lab_7
             public Judge(string name, int[] marks)
             {
                 _name = name;
-                if (marks == null) _marks = null;
-                else
+                if (marks != null)
                 {
-                    _marks = new int[marks.Length];
-                    Array.Copy(marks, _marks, marks.Length);
+                    int n = marks.Length;
+                    _marks = new int[n];
+                    Array.Copy(marks, _marks, n);
                 }
             }
 
@@ -135,7 +137,7 @@ namespace Lab_7
                 if (_marks == null || _marks.Length == 0) return 0;
 
                 int mark = _marks[_NMark];
-                _NMark = (_NMark + 1) % _marks.Length; // Исправленный циклический переход
+                _NMark = (_NMark + 1) % _marks.Length;
                 return mark;
             }
 
@@ -207,10 +209,7 @@ namespace Lab_7
                 int indexN = _participants.Length;
 
                 Array.Resize(ref _participants, indexN + players.Length);
-                for (int i1 = indexN; i1 < _participants.Length; i1++)
-                {
-                    _participants[i1] = players[i1 - indexN];
-                }
+                Array.Copy(players, 0, _participants, indexN, players.Length);
 
                 for (int i = indexN; i < _participants.Length; i++) Evaluate(_participants[i]);
                     
