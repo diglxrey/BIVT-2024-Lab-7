@@ -121,17 +121,19 @@ namespace Lab_7
 
             public void Sort()
             {
-                if (_sportsmen == null || _sportsmen.Length < 2) return;
-                for (int i = 1; i < _sportsmen.Length; i++)
+                if (_sportsmen == null) return;
+
+                for (int i2 = 0; i2 < _sportsmen.Length - 1; i2++)
                 {
-                    var current = _sportsmen[i];
-                    int j = i - 1;
-                    while (j >= 0 && _sportsmen[j].Time > current.Time)
+                    for (int j1 = 0; j1 < _sportsmen.Length - i2 - 1; j1++)
                     {
-                        _sportsmen[j + 1] = _sportsmen[j];
-                        j--;
+                        if (_sportsmen[j1].Time > _sportsmen[j1 + 1].Time)
+                        {
+                            Sportsman temp = _sportsmen[j1];
+                            _sportsmen[j1] = _sportsmen[j1 + 1];
+                            _sportsmen[j1 + 1] = temp;
+                        }
                     }
-                    _sportsmen[j + 1] = current;
                 }
             }
             public static Group Merge(Group group1, Group group2)
@@ -173,30 +175,32 @@ namespace Lab_7
                     women = null;
                     return;
                 }
-                int menCount = 0;
-                int womenCount = 0;
+                //    int menCount = 0;
+                //    int womenCount = 0;
 
-                foreach (var sportsman in _sportsmen)
-                {
-                    if (sportsman is SkiMan)
-                        menCount++;
-                    else if (sportsman is SkiWoman)
-                        womenCount++;
-                }
+                //    foreach (var sportsman in _sportsmen)
+                //    {
+                //        if (sportsman is SkiMan)
+                //            menCount++;
+                //        else if (sportsman is SkiWoman)
+                //            womenCount++;
+                //    }
 
-                men = new SkiMan[menCount];
-                women = new SkiWoman[womenCount];
+                //    men = new SkiMan[menCount];
+                //    women = new SkiWoman[womenCount];
 
-                int menIndex = 0;
-                int womenIndex = 0;
+                //    int menIndex = 0;
+                //    int womenIndex = 0;
 
-                foreach (var sportsman in _sportsmen)
-                {
-                    if (sportsman is SkiMan man)
-                        men[menIndex++] = man;
-                    else if (sportsman is SkiWoman woman)
-                        women[womenIndex++] = woman;
-                }
+                //    foreach (var sportsman in _sportsmen)
+                //    {
+                //        if (sportsman is SkiMan man)
+                //            men[menIndex++] = man;
+                //        else if (sportsman is SkiWoman woman)
+                //            women[womenIndex++] = woman;
+                //    }
+                men = _sportsmen.Where(s => s is SkiMan).ToArray();
+                women = _sportsmen.Where(s => s is SkiWoman).ToArray();
             }
 
             public void Shuffle()
