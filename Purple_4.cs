@@ -212,7 +212,8 @@ namespace Lab_7
 
                 if (men == null || women == null || men.Length == 0 || women.Length == 0)
                     return;
-
+                women = women.OrderBy(s => s.Time).ToArray();
+                men = men.OrderBy(s => s.Time).ToArray();
 
                 int i = 0, j = 0, k = 0;
 
