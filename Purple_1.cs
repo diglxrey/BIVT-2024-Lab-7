@@ -162,7 +162,6 @@ namespace Lab_7
             private Judge[] _judges;
             private Participant[] _participants;
             public Judge[] Judges => _judges;
-            public Participant[] Participants => (_participants == null) ? _participants : (Participant[])_participants.Clone();
 
             public Competition(Judge[] judges)
             {
