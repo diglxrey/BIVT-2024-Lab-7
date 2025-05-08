@@ -162,6 +162,7 @@ namespace Lab_7
             private Judge[] _judges;
             private Participant[] _participants;
             public Judge[] Judges => _judges;
+            public Participant[] Participants => _participants;
 
             public Competition(Judge[] judges)
             {
